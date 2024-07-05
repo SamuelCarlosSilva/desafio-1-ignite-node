@@ -1,6 +1,7 @@
 import { buildRoutePath } from "./utils/build-route-path.js";
-import {randomUUID} from "node:crypto"
+import { randomUUID } from "node:crypto"
 import { Database } from "./database.js";
+import { title } from "node:process";
 
 
 const database = new Database()
@@ -24,8 +25,23 @@ export const routes = [
 
             database.insert("tasks", task)
 
-            return res.writeHead(201).end('Task criada')
+            return res.writeHead(201).end(JSON.stringify(task))
 
+        },
+
+    },
+    {
+        method: 'GET',
+        path: buildRoutePath('/tasks'),
+        handler: (req, res) => {
+            const { search } = req.query
+
+            const tasks = database.select('tasks', search ? {
+                title: search,
+                description: search
+            } : null)
+
+            return res.end(JSON.stringify(tasks))
         }
     }
 ]
